@@ -7,22 +7,24 @@ const screenWidth = Dimensions.get('screen').width;
 
 export default function AlbumData({ route, navigation }) {
   const [albumInfo, setAlbumInfo] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded) getAlbumInfo();
-  }, [isLoaded])
+    if (isLoading) getAlbumInfo();
+  }, [isLoading])
 
   const getAlbumInfo = async () => {
     try {
       const result = await fetch(`https://api.deezer.com/album/${route.params.albumId}`);
       const data = await result.json();
       setAlbumInfo(data);
-      setIsLoaded(true);
     }
     catch (error) {
       Alert.alert('Album data could not be loaded. ' + error.message);
       console.error(error);
+    }
+    finally {
+      setIsLoading(false);
     }
   }
 
@@ -35,7 +37,7 @@ export default function AlbumData({ route, navigation }) {
     )
   }
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <AnimatedLottieView

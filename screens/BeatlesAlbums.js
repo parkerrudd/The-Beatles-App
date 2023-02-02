@@ -7,22 +7,24 @@ const screenWidth = Dimensions.get('screen').width;
 
 export default function BeatlesAlbums({ navigation }) {
   const [deezerData, setDeezerData] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded) getDeezerData();
-  }, [isLoaded])
+    if (isLoading) getDeezerData();
+  }, [isLoading])
 
   const getDeezerData = async () => {
     try {
       const result = await fetch('https://api.deezer.com/artist/1/albums?limit=50');
       const data = await result.json();
       setDeezerData(data?.data);
-      setIsLoaded(true);
     }
     catch (error) {
       Alert.alert('Album data could not be loaded. ' + error.message);
       console.error(error);
+    }
+    finally {
+      setIsLoading(false);
     }
   }
 
@@ -45,7 +47,7 @@ export default function BeatlesAlbums({ navigation }) {
     )
   }
 
-  if (!isLoaded) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <AnimatedLottieView

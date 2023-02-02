@@ -14,7 +14,7 @@ export default function BeatlesAlbums({ navigation }) {
   })
 
   if (error) {
-    Alert.alert('Albums unable to load. ' + error.message);
+    Alert.alert('Albums are unable to load. ' + error.message);
     console.error(error);
   }
 
@@ -30,7 +30,7 @@ export default function BeatlesAlbums({ navigation }) {
         <View style={styles.listItem}>
           <Image
             style={styles.images}
-            source={{ uri: item?.cover_big }}
+            source={{ uri: item.cover_big }}
           />
         </View>
       </TouchableOpacity>

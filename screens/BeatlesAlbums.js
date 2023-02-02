@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, Dimensions, Image, View, SafeAreaView, FlatList, TextInputComponent } from 'react-native';
+import { StyleSheet, Text, Platform, TouchableOpacity, Dimensions, Image, View, SafeAreaView, FlatList } from 'react-native';
 import AnimatedLottieView from 'lottie-react-native';
 
-const API_URL = 'https://api.deezer.com/artist/1/albums?limit=50';
 const screenWidth = Dimensions.get('screen').width;
 
 export default function BeatlesAlbums({ navigation }) {
@@ -16,15 +15,14 @@ export default function BeatlesAlbums({ navigation }) {
 
   const getDeezerData = async () => {
     try {
-      const result = await fetch(API_URL);
+      const result = await fetch('https://api.deezer.com/artist/1/albums?limit=50');
       const data = await result.json();
       setDeezerData(data?.data);
+      setIsLoaded(true);
     } 
     catch (error) {
       console.error(error);
-    }
-    finally {
-      setIsLoaded(true);
+      throw error;
     }
   }
 
@@ -40,32 +38,34 @@ export default function BeatlesAlbums({ navigation }) {
         <View style={styles.listItem}>
           <Image
             style={styles.images}
-            source={{ uri: item.cover_big }}
+            source={{ uri: item?.cover_big }}
           />
         </View>
       </TouchableOpacity>
     )
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto"  />
-      { !isLoaded ? (
+  if (!isLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
         <AnimatedLottieView
           source={require('../assets/99833-edupia-loading.json')}
           autoPlay
         />
-      ) : (
-      <View>
-        <Text style={styles.text}>The Beatles</Text>
-        <FlatList
-          style={styles.list}
-          data={deezerData}
-          renderItem={renderItem}
-          numColumns={3}
-        />
-      </View>
-      )}
+      </SafeAreaView>
+    )
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="auto"  />
+      <Text style={styles.text}>The Beatles</Text>
+      <FlatList
+        style={styles.list}
+        data={deezerData}
+        renderItem={renderItem}
+        numColumns={3}
+      />
     </SafeAreaView>
   );
 }
@@ -76,14 +76,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#243E72',
     alignItems: 'center',
     justifyContent: 'center',
-    maxWidth: screenWidth
+    maxWidth: screenWidth,
+    paddingTop: Platform.OS === 'android' ? 35 : 0
   },
   list: {
     marginTop: 10
   },
   listItem: {
     margin: 5,
-    shadowOpacity: 0.3
+    shadowOpacity: 0.2
   },
   text: {
     color: '#fff',

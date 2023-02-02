@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#243E72',
-    paddingTop: Platform.OS === 'android' ? 35 : 0
+    paddingTop: Platform.OS === 'android' ? 50 : 0
   },
   backArrow: {
     position: 'absolute',
-    top: 40,
+    top: Platform.OS === 'android' ? 50 : 40,
     left: 20,
     color: '#fff'
   },

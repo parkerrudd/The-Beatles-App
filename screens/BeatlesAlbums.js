@@ -1,31 +1,21 @@
-import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, Platform, TouchableOpacity, Dimensions, Image, View, SafeAreaView, FlatList, Alert } from 'react-native';
 import AnimatedLottieView from 'lottie-react-native';
+import { useQuery } from 'react-query';
 
 const screenWidth = Dimensions.get('screen').width;
 
 export default function BeatlesAlbums({ navigation }) {
-  const [deezerData, setDeezerData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, error, data } = useQuery('deezerData', async () => {
+    const res = await fetch('https://api.deezer.com/artist/1/albums?limit=50');
+    const jsonData = res.json();
+    return jsonData;
+  })
 
-  useEffect(() => {
-    if (isLoading) getDeezerData();
-  }, [isLoading])
-
-  const getDeezerData = async () => {
-    try {
-      const result = await fetch('https://api.deezer.com/artist/1/albums?limit=50');
-      const data = await result.json();
-      setDeezerData(data?.data);
-    }
-    catch (error) {
-      Alert.alert('Album data could not be loaded. ' + error.message);
-      console.error(error);
-    }
-    finally {
-      setIsLoading(false);
-    }
+  if (error) {
+    Alert.alert('Albums are unable to load. ' + error.message);
+    console.error(error);
   }
 
   const handleAlbumPress = (albumId) => {
@@ -40,7 +30,7 @@ export default function BeatlesAlbums({ navigation }) {
         <View style={styles.listItem}>
           <Image
             style={styles.images}
-            source={{ uri: item?.cover_big }}
+            source={{ uri: item.cover_big }}
           />
         </View>
       </TouchableOpacity>
@@ -64,7 +54,7 @@ export default function BeatlesAlbums({ navigation }) {
       <Text style={styles.text}>The Beatles</Text>
       <FlatList
         style={styles.list}
-        data={deezerData}
+        data={data?.data}
         renderItem={renderItem}
         numColumns={3}
       />
@@ -90,7 +80,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: '700',
     textAlign: 'center'
   },

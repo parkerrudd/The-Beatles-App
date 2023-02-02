@@ -1,31 +1,21 @@
-import { useState, useEffect } from "react";
+import * as React from 'react';
 import { SafeAreaView, Text, View, TouchableWithoutFeedback, Platform, Dimensions, Image, StyleSheet, FlatList, Alert } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "react-query";
 
 const screenWidth = Dimensions.get('screen').width;
 
 export default function AlbumData({ route, navigation }) {
-  const [albumInfo, setAlbumInfo] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading, error, data } = useQuery(`albumData-${route.params.albumId}`, async () => {
+    const res = await fetch(`https://api.deezer.com/album/${route.params.albumId}`);
+    const jsonData = await res.json();
+    return jsonData;
+  });
 
-  useEffect(() => {
-    if (isLoading) getAlbumInfo();
-  }, [isLoading])
-
-  const getAlbumInfo = async () => {
-    try {
-      const result = await fetch(`https://api.deezer.com/album/${route.params.albumId}`);
-      const data = await result.json();
-      setAlbumInfo(data);
-    }
-    catch (error) {
-      Alert.alert('Album data could not be loaded. ' + error.message);
-      console.error(error);
-    }
-    finally {
-      setIsLoading(false);
-    }
+  if (error) {
+    Alert.alert('Album data is unable load. ' + error.message);
+    console.error(error);
   }
 
   const renderItem = ({ item, index }) => {
@@ -59,12 +49,12 @@ export default function AlbumData({ route, navigation }) {
       </TouchableWithoutFeedback>
       <Image
         style={styles.artwork}
-        source={{ uri: albumInfo?.cover_big }}
+        source={{ uri: data?.cover_big }}
       />
-      <Text style={styles.text}>{albumInfo?.artist?.name}</Text>
-      <Text style={styles.text}>{albumInfo?.title} ({albumInfo?.release_date.slice(0, 4)})</Text>
+      <Text style={styles.text}>{data?.artist?.name}</Text>
+      <Text style={styles.text}>{data?.title} ({data?.release_date.slice(0, 4)})</Text>
       <FlatList
-        data={albumInfo?.tracks?.data}
+        data={data?.tracks?.data}
         renderItem={renderItem}
       />
     </SafeAreaView>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, Platform, TouchableOpacity, Dimensions, Image, View, SafeAreaView, FlatList } from 'react-native';
+import { StyleSheet, Text, Platform, TouchableOpacity, Dimensions, Image, View, SafeAreaView, FlatList, Alert } from 'react-native';
 import AnimatedLottieView from 'lottie-react-native';
 
 const screenWidth = Dimensions.get('screen').width;
@@ -19,10 +19,10 @@ export default function BeatlesAlbums({ navigation }) {
       const data = await result.json();
       setDeezerData(data?.data);
       setIsLoaded(true);
-    } 
+    }
     catch (error) {
+      Alert.alert('Album data could not be loaded. ' + error.message);
       console.error(error);
-      throw error;
     }
   }
 
@@ -49,7 +49,7 @@ export default function BeatlesAlbums({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <AnimatedLottieView
-          source={require('../assets/99833-edupia-loading.json')}
+          source={require('../assets/loading-spinner.json')}
           autoPlay
         />
       </SafeAreaView>

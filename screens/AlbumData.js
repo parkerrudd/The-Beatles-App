@@ -15,15 +15,14 @@ export default function AlbumData({ route, navigation }) {
 
   const getAlbumInfo = async () => {
     try {
-      const result = await fetch(`https://api.deezer.com/album/${route.params.albumId}`)
+      const result = await fetch(`https://api.deezer.com/album/${route.params.albumId}`);
       const data = await result.json();
       setAlbumInfo(data);
       setIsLoaded(true);
     }
     catch (error) {
-      Alert.alert('Album data could not be loaded.');
+      Alert.alert('Album data could not be loaded. ' + error.message);
       console.error(error);
-      throw error;
     }
   }
 
@@ -40,7 +39,7 @@ export default function AlbumData({ route, navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <AnimatedLottieView
-          source={require('../assets/99833-edupia-loading.json')}
+          source={require('../assets/loading-spinner.json')}
           autoPlay
         />
       </SafeAreaView>
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
   },
   backArrow: {
     position: 'absolute',
-    top: 35,
+    top: 40,
     left: 20,
     color: '#fff'
   },
